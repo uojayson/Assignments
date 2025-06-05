@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>GOT Set Locations</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body { margin: 0; padding: 0; font-family: sans-serif; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+    .sidebar {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 1;
+    }
+
+    .sidebar button {
+      display: block;
+      margin: 6px 0;
+      padding: 8px 12px;
+      width: 120px;
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .sidebar button:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="sidebar">
+  <button onclick="flyToCountry('uk')">United Kingdom</button>
+  <button onclick="flyToCountry('iceland')">Iceland</button>
+  <button onclick="flyToCountry('croatia')">Croatia</button>
+  <button onclick="flyToCountry('spain')">Spain</button>
+  <button onclick="flyToCountry('morocco')">Morocco</button>
+  <button onclick="flyToCountry('malta')">Malta</button>
+</div>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script>
+  // ─────────────────────────────────────────────────────────────────────────────
+  mapboxgl.accessToken = 'pk.eyJ1IjoidW9qYXlzb24iLCJhIjoiY205MXVobXpiMDR4aTJscG5hOXFxZHl0bSJ9.MlvSlTlLNktgtxWa-vinGQ';
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v11',
+    projection: 'globe',
+    center: [0, 20],
+    zoom: 1.5
+  });
+
+  map.on('style.load', () => {
+    map.setFog({});
+  });
+
+
+
+  const markerData = {
+    // ─────────── United Kingdom ───────────
+    uk: [
+      // 1) Doune Castle, Scotland
+      {
+        coords: [-4.0497, 56.1858],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Doune Castle, Scotland</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Serves as the main filming location for Winterfell.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/doune_castle1.jpg" alt="Doune Castle View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/doune_castle2.jpg" alt="Doune Castle View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/doune_castle3.jpg" alt="Doune Castle View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/doune_castle4.jpg" alt="Doune Castle View 4" style="width:100%; border-radius:4px;" />
+            <img src="images/doune_castle5.jpg" alt="Doune Castle View 5" style="width:100%; border-radius:4px;" />
+            <img src="images/doune_castle6.jpg" alt="Doune Castle View 6" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 2) Castle Ward, Northern Ireland
+      {
+        coords: [-5.5680, 54.4481],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Castle Ward, Northern Ireland</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Another key location for Winterfell, including the towers and stableyard.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/castle_ward1.jpg" alt="Castle Ward View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/castle_ward2.jpg" alt="Castle Ward View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/castle_ward3.jpg" alt="Castle Ward View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/castle_ward4.jpg" alt="Castle Ward View 4" style="width:100%; border-radius:4px;" />
+            <img src="images/castle_ward5.jpg" alt="Castle Ward View 5" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 3) Glens of Antrim, Northern Ireland
+      {
+        coords: [-6.0726, 55.1334],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Glens of Antrim, Northern Ireland</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Used for the Dothraki Sea.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/glens_of_antrim1.jpg" alt="Glens of Antrim View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/glens_of_antrim2.jpg" alt="Glens of Antrim View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/glens_of_antrim3.jpg" alt="Glens of Antrim View 3" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 4) The Dark Hedges, Northern Ireland
+      {
+        coords: [-6.5103, 55.1344],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">The Dark Hedges, Northern Ireland</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Used for the Kingsroad.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/the_dark_hedges1.jpg" alt="The Dark Hedges View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/the_dark_hedges2.jpg" alt="The Dark Hedges View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/the_dark_hedges3.jpg" alt="The Dark Hedges View 3" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 5) Paint Hall Studios, Belfast
+      {
+        coords: [-5.9089, 54.6050],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Paint Hall Studios, Belfast</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Indoor sets, including the Red Keep, Iron Throne, and the Great Sept of Baelor.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/paint_hall_studios1.jpg" alt="Paint Hall Studios View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/paint_hall_studios2.jpg" alt="Paint Hall Studios View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/paint_hall_studios3.jpg" alt="Paint Hall Studios View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/paint_hall_studios4.jpg" alt="Paint Hall Studios View 4" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 6) Magheramorne Quarry, Northern Ireland
+      {
+        coords: [-5.7995, 54.7552],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Magheramorne Quarry, Northern Ireland</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Castle Black and the Wall.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/magheramorne_quarry1.jpg" alt="Magheramorne Quarry View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/magheramorne_quarry2.jpg" alt="Magheramorne Quarry View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/magheramorne_quarry3.jpg" alt="Magheramorne Quarry View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/magheramorne_quarry4.jpg" alt="Magheramorne Quarry View 4" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      }
+    ],
+
+    // ───────────── Iceland ─────────────
+    iceland: [
+      // 1) Thingvellir National Park
+      {
+        coords: [-21.0000, 64.2550],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Thingvellir National Park</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Wildling camp and a sword fight between Brienne and the Hound.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/thingvellir_national_park1.jpg" alt="Thingvellir View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/thingvellir_national_park2.jpg" alt="Thingvellir View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/thingvellir_national_park3.jpg" alt="Thingvellir View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/thingvellir_national_park4.jpg" alt="Thingvellir View 4" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 2) Svínafellsjökull
+      {
+        coords: [-16.7884, 64.0061],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Svínafellsjökull</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Used for scenes north of the Wall.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/svinafellsjökull1.jpg" alt="Svínafellsjökull View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/svinafellsjökull2.jpg" alt="Svínafellsjökull View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/svinafellsjökull3.jpg" alt="Svínafellsjökull View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/svinafellsjökull4.jpg" alt="Svínafellsjökull View 4" style="width:100%; border-radius:4px;" />
+            <img src="images/svinafellsjökull5.jpg" alt="Svínafellsjökull View 5" style="width:100%; border-radius:4px;" />
+            <img src="images/svinafellsjökull6.jpg" alt="Svínafellsjökull View 6" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 3) Kirkjufell
+      {
+        coords: [-23.3064, 64.9270],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Kirkjufell</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            A famous mountain used for scenes beyond the Wall.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/kirkjufell1.jpg" alt="Kirkjufell View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/kirkjufell2.jpg" alt="Kirkjufell View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/kirkjufell3.jpg" alt="Kirkjufell View 3" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      }
+    ],
+
+    // ───────────── Croatia ─────────────
+    croatia: [
+      // 1) Dubrovnik
+      {
+        coords: [18.0944, 42.6400],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Dubrovnik</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            King’s Landing, including the City Walls and Gradac Park.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/dubrovnik1.jpg" alt="Dubrovnik View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/dubrovnik2.jpg" alt="Dubrovnik View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/dubrovnik3.jpg" alt="Dubrovnik View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/dubrovnik4.jpg" alt="Dubrovnik View 4" style="width:100%; border-radius:4px;" />
+            <img src="images/dubrovnik5.jpg" alt="Dubrovnik View 5" style="width:100%; border-radius:4px;" />
+            <img src="images/dubrovnik6.jpg" alt="Dubrovnik View 6" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 2) Split
+      {
+        coords: [16.4402, 43.5081],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Split</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            King’s Landing exteriors.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/split1.jpg" alt="Split View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/split2.jpg" alt="Split View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/split3.jpg" alt="Split View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/split4.jpg" alt="Split View 4" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 3) Šibenik
+      {
+        coords: [15.8950, 43.7350],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Šibenik</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Braavos.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/sibenik1.jpg" alt="Šibenik View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/sibenik2.jpg" alt="Šibenik View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/sibenik3.jpg" alt="Šibenik View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/sibenik4.jpg" alt="Šibenik View 4" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      }
+    ],
+
+    // ───────────── Spain ─────────────
+    spain: [
+      // 1) Bardenas Reales
+      {
+        coords: [-1.5353, 42.2051],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Bardenas Reales</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Dothraki Sea.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/bardenas_reales1.jpg" alt="Bardenas Reales View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/bardenas_reales2.jpg" alt="Bardenas Reales View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/bardenas_reales3.jpg" alt="Bardenas Reales View 3" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 2) Castillo de Zafra, Guadalajara
+      {
+        coords: [-2.2031, 40.8590],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Castillo de Zafra, Guadalajara</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Tower of Joy.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/castillo_de_zafra1.jpg" alt="Castillo de Zafra View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/castillo_de_zafra2.jpg" alt="Castillo de Zafra View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/castillo_de_zafra3.jpg" alt="Castillo de Zafra View 3" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 3) The Ruins of Italica, Seville
+      {
+        coords: [-6.0442, 37.4360],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">The Ruins of Italica, Seville</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Dragonpit.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/the_ruins_of_italica1.jpg" alt="Ruins of Italica View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/the_ruins_of_italica2.jpg" alt="Ruins of Italica View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/the_ruins_of_italica3.jpg" alt="Ruins of Italica View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/the_ruins_of_italica4.jpg" alt="Ruins of Italica View 4" style="width:100%; border-radius:4px;" />
+            <img src="images/the_ruins_of_italica5.jpg" alt="Ruins of Italica View 5" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 4) Alcázar of Seville
+      {
+        coords: [-5.9903, 37.3857],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Alcázar of Seville</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Water Gardens of Sunspear.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/alcázar_of_seville1.jpg" alt="Alcázar View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/alcázar_of_seville2.jpg" alt="Alcázar View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/alcázar_of_seville3.jpg" alt="Alcázar View 3" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 5) Córdoba
+      {
+        coords: [-4.7794, 37.8882],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Córdoba</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Used in seasons 5 and 6, including the fight between the Mountain and the Viper.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/córdoba1.jpg" alt="Córdoba View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/córdoba2.jpg" alt="Córdoba View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/córdoba3.jpg" alt="Córdoba View 3" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      }
+    ],
+
+    // ───────────── Morocco ─────────────
+    morocco: [
+      // 1) Essaouira
+      {
+        coords: [-9.7620, 31.5085],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Essaouira</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Astapor and some King’s Landing scenes.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/essaouira1.jpg" alt="Essaouira View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/essaouira2.jpg" alt="Essaouira View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/essaouira3.jpg" alt="Essaouira View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/essaouira4.jpg" alt="Essaouira View 4" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 2) Ouarzazate
+      {
+        coords: [-6.9094, 30.9220],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Ouarzazate</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Pentos.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/ouarzazate1.jpg" alt="Ouarzazate View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/ouarzazate2.jpg" alt="Ouarzazate View 2" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      },
+
+      // 3) Aït Benhaddou
+      {
+        coords: [-7.1304, 31.0471],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Aït Benhaddou</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Yunkai.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/ait_benhaddou1.jpg" alt="Aït Benhaddou View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/ait_benhaddou2.jpg" alt="Aït Benhaddou View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/ait_benhaddou3.jpg" alt="Aït Benhaddou View 3" style="width:100%; border-radius:4px;" />
+            <img src="images/ait_benhaddou4.jpg" alt="Aït Benhaddou View 4" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      }
+    ],
+
+    // ───────────── Malta ─────────────
+    malta: [
+      // 1) Azure Window
+      {
+        coords: [14.1902, 36.0556],
+        popupHTML: `
+        <div style="
+          font-family: sans-serif;
+          max-width: 240px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding: 5px;
+        ">
+          <h3 style="margin:0 0 5px; font-size:16px;">Azure Window</h3>
+          <p style="margin:0 0 5px; font-size:14px;">
+            Marriage of Khal Drogo and Daenerys.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+            <img src="images/azure_window1.jpg" alt="Azure Window View 1" style="width:100%; border-radius:4px;" />
+            <img src="images/azure_window2.jpg" alt="Azure Window View 2" style="width:100%; border-radius:4px;" />
+            <img src="images/azure_window3.jpg" alt="Azure Window View 3" style="width:100%; border-radius:4px;" />
+          </div>
+        </div>`
+      }
+    ]
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Keep track of currently‐shown markers so we can remove them when switching countries
+  let activeMarkers = [];
+
+  function flyToCountry(code) {
+    const locations = {
+      uk:      { center: [-3.435973, 55.378051], zoom: 5 },
+      iceland: { center: [-19.0208, 64.9631], zoom: 5 },
+      croatia: { center: [15.2, 45.1], zoom: 6 },
+      spain:   { center: [-3.7038, 40.4168], zoom: 5.5 },
+      morocco: { center: [-6.8498, 33.9716], zoom: 5.5 },
+      malta:   { center: [14.5146, 35.8997], zoom: 7 }
+    };
+
+    const target = locations[code];
+    if (!target) return;
+
+    // 1) Remove any existing markers from the map
+    activeMarkers.forEach(marker => marker.remove());
+    activeMarkers = [];
+
+    // 2) Fly the map to the new center/zoom
+    map.flyTo({
+      center:   target.center,
+      zoom:     target.zoom,
+      speed:    1.2,
+      curve:    1,
+      essential: true
+    });
+
+    // 3) Once the globe finishes flying, add this country’s markers
+    map.once('moveend', () => {
+      (markerData[code] || []).forEach(entry => {
+        if (!entry.popupHTML) {
+          console.error('Missing popupHTML for marker:', entry);
+          return;
+        }
+
+        // 1) Create an <img> DOM node for your PNG icon
+const el = document.createElement('img');
+el.src = 'images/pin1.png';      // path to your PNG
+el.style.width = '50px';                // adjust size as needed
+el.style.height = '50px';
+el.style.cursor = 'pointer';            // if you want a pointer cursor on hover
+// (You can also add border-radius, box-shadow, etc. by inline CSS or a CSS class)
+
+// 2) Instantiate the marker using that element
+const marker = new mapboxgl.Marker({ element: el })
+  .setLngLat(entry.coords)
+  .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(entry.popupHTML))
+  .addTo(map);
+
+activeMarkers.push(marker);
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
