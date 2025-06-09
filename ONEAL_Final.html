@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>GOT Set Locations</title>
@@ -7,97 +7,152 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; }
-    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    #map { position: absolute; top: 100px; bottom: 0; width: 100%; }
+
+    /* Header at top */
+    .header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+      z-index: 2;
+    }
+    .header h1 { margin: 0 0 5px; font-size: 24px; }
+    .header p  { margin: 0; font-size: 16px; }
 
     .sidebar {
       position: absolute;
-      top: 20px;
+      top: 120px; 
       left: 20px;
       background: rgba(0, 0, 0, 0.7);
       padding: 10px;
       border-radius: 8px;
-      z-index: 1;
+      z-index: 2;
     }
-
     .sidebar button {
       display: block;
       margin: 6px 0;
       padding: 8px 12px;
-      width: 120px;
+      width: 140px;
       background-color: #222;
       color: #fff;
       border: 1px solid #555;
       border-radius: 4px;
       cursor: pointer;
     }
-
     .sidebar button:hover {
       background-color: #444;
     }
+      
+    /* Different wrap around the reset button */
+.reset-container {
+  background-color: rgba(255,255,255,0.2); 
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+/* To make the reset button fill its box */
+.reset-container .reset-button {
+  width: 100%;
+  background-color: #ccc;
+  color: #000;
+  border: 1px solid #aaa;
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
 
-<div id="map"></div>
+  <!-- Header box with title and description -->
+  <div class="header" role="banner">
+    <h1>Game of Thrones Set Locations</h1>
+    <p>Navigate around the world with this interactive map of where the hit TV show Game of Thrones was filmed!</p>
+    <p>Click on the countries to the left to fly there and look at individual locations</p>
 
-<div class="sidebar">
+  </div>
+
+  <!-- Map container with an ARIA label for accessibility -->
+  <div id="map" role="application" aria-label="Interactive globe showing filming locations for the TV show Game of Thrones"></div>
+
+  <!-- Sidebar of country buttons and reset button -->
+  <div class="sidebar" role="navigation" aria-label="Country selector">
   <button onclick="flyToCountry('uk')">United Kingdom</button>
   <button onclick="flyToCountry('iceland')">Iceland</button>
   <button onclick="flyToCountry('croatia')">Croatia</button>
   <button onclick="flyToCountry('spain')">Spain</button>
   <button onclick="flyToCountry('morocco')">Morocco</button>
   <button onclick="flyToCountry('malta')">Malta</button>
+
+  <!-- Separate box for reset button -->
+  <div class="reset-container">
+    <button onclick="resetView()" class="reset-button">Reset Globe</button>
+  </div>
 </div>
 
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-<script>
-  // ─────────────────────────────────────────────────────────────────────────────
-  mapboxgl.accessToken = 'pk.eyJ1IjoidW9qYXlzb24iLCJhIjoiY205MXVobXpiMDR4aTJscG5hOXFxZHl0bSJ9.MlvSlTlLNktgtxWa-vinGQ';
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidW9qYXlzb24iLCJhIjoiY205MXVobXpiMDR4aTJscG5hOXFxZHl0bSJ9.MlvSlTlLNktgtxWa-vinGQ';
 
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v11',
-    projection: 'globe',
-    center: [0, 20],
-    zoom: 1.5
-  });
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v11',
+      projection: 'globe',
+      center: [0, 20],
+      zoom: 1.5,
+      maxZoom: 10        
+    });
 
-  map.on('style.load', () => {
-    map.setFog({});
-  });
+    map.on('style.load', () => {
+      map.setFog({});
+    });
 
+    // Pre-defined bounds for each country
+    const countryBounds = {
+      uk:      [[-8, 49], [2, 60]],
+      iceland: [[-25, 63], [-13, 66]],
+      croatia: [[13, 42], [19, 46]],
+      spain:   [[-10,36], [3, 44]],
+      morocco: [[-12,28], [-1,36]],
+      malta:   [[14,35], [15.5,36.2]]
+    };
 
 
   const markerData = {
     // ─────────── United Kingdom ───────────
     uk: [
-      // 1) Doune Castle, Scotland
+      //  Doune Castle, Scotland
       {
         coords: [-4.0497, 56.1858],
         popupHTML: `
-        <div style="
-          font-family: sans-serif;
-          max-width: 240px;
-          max-height: 240px;
-          overflow-y: auto;
-          padding: 5px;
-        ">
-          <h3 style="margin:0 0 5px; font-size:16px;">Doune Castle, Scotland</h3>
-          <p style="margin:0 0 5px; font-size:14px;">
-            Serves as the main filming location for Winterfell.
-          </p>
-          <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
-            <img src="doune_castle1.jpg" alt="Doune Castle View 1" style="width:100%; border-radius:4px;" />
-            <img src="doune_castle2.jpg" alt="Doune Castle View 2" style="width:100%; border-radius:4px;" />
-            <img src="doune_castle3.jpg" alt="Doune Castle View 3" style="width:100%; border-radius:4px;" />
-            <img src="doune_castle4.jpg" alt="Doune Castle View 4" style="width:100%; border-radius:4px;" />
-            <img src="doune_castle5.jpg" alt="Doune Castle View 5" style="width:100%; border-radius:4px;" />
-            <img src="doune_castle6.jpg" alt="Doune Castle View 6" style="width:100%; border-radius:4px;" />
-          </div>
-        </div>`
+            <div style="
+              font-family: sans-serif;
+              max-width: 240px;
+              max-height: 240px;
+              overflow-y: auto;
+              padding: 5px;
+            ">
+                <h3 style="margin:0 0 5px; font-size:16px;">Doune Castle, Scotland</h3>
+                <p style="margin:0 0 5px; font-size:14px;">
+                Serves as the main filming location for Winterfell.
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
+                <img src="doune_castle4.jpg" alt="Doune Castle view 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: afilmtopia
+                <img src="doune_castle5.jpg" alt="Doune Castle view 5" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Colin Woolf
+                <img src="doune_castle6.jpg" alt="Doune Castle view 6" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Lili Plameneya
+              </div>
+            </div>`
       },
 
-      // 2) Castle Ward, Northern Ireland
+      //  Castle Ward, Northern Ireland
       {
         coords: [-5.5680, 54.4481],
         popupHTML: `
@@ -113,16 +168,20 @@
             Another key location for Winterfell, including the towers and stableyard.
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
-            <img src="castle_ward1.jpg" alt="Castle Ward View 1" style="width:100%; border-radius:4px;" />
-            <img src="castle_ward2.jpg" alt="Castle Ward View 2" style="width:100%; border-radius:4px;" />
             <img src="castle_ward3.jpg" alt="Castle Ward View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Ciaran Connolly     
             <img src="castle_ward4.jpg" alt="Castle Ward View 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Bandicam / HBO      
             <img src="castle_ward5.jpg" alt="Castle Ward View 5" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Comic Con Northern Ireland / HBO     
           </div>
         </div>`
       },
 
-      // 3) Glens of Antrim, Northern Ireland
+      //  Glens of Antrim, Northern Ireland
       {
         coords: [-6.0726, 55.1334],
         popupHTML: `
@@ -139,13 +198,16 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="glens_of_antrim1.jpg" alt="Glens of Antrim View 1" style="width:100%; border-radius:4px;" />
-            <img src="glens_of_antrim2.jpg" alt="Glens of Antrim View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Paul Lindsay / Tourism Ireland     
             <img src="glens_of_antrim3.jpg" alt="Glens of Antrim View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Stefan Schnebelt Photography    
           </div>
         </div>`
       },
 
-      // 4) The Dark Hedges, Northern Ireland
+      //  The Dark Hedges, Northern Ireland
       {
         coords: [-6.5103, 55.1344],
         popupHTML: `
@@ -162,13 +224,16 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="the_dark_hedges1.jpg" alt="The Dark Hedges View 1" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Katy Thornton / HBO     
             <img src="the_dark_hedges2.jpg" alt="The Dark Hedges View 2" style="width:100%; border-radius:4px;" />
-            <img src="the_dark_hedges3.jpg" alt="The Dark Hedges View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Matt Powell / HBO     
           </div>
         </div>`
       },
 
-      // 5) Paint Hall Studios, Belfast
+      //  Paint Hall Studios, Belfast
       {
         coords: [-5.9089, 54.6050],
         popupHTML: `
@@ -185,14 +250,19 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="paint_hall_studios1.jpg" alt="Paint Hall Studios View 1" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Tom Dowling    
             <img src="paint_hall_studios2.jpg" alt="Paint Hall Studios View 2" style="width:100%; border-radius:4px;" />
-            <img src="paint_hall_studios3.jpg" alt="Paint Hall Studios View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Titanic Studios / Painthall Studio     
             <img src="paint_hall_studios4.jpg" alt="Paint Hall Studios View 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Alamy 
           </div>
         </div>`
       },
 
-      // 6) Magheramorne Quarry, Northern Ireland
+      //  Magheramorne Quarry, Northern Ireland
       {
         coords: [-5.7995, 54.7552],
         popupHTML: `
@@ -209,9 +279,14 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="magheramorne_quarry1.jpg" alt="Magheramorne Quarry View 1" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Sam Eccles     
             <img src="magheramorne_quarry2.jpg" alt="Magheramorne Quarry View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Ontario Stone, Sand & Gravel Association     
             <img src="magheramorne_quarry3.jpg" alt="Magheramorne Quarry View 3" style="width:100%; border-radius:4px;" />
-            <img src="magheramorne_quarry4.jpg" alt="Magheramorne Quarry View 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Mining Association of Nova Scotia / HBO    
           </div>
         </div>`
       }
@@ -219,7 +294,7 @@
 
     // ───────────── Iceland ─────────────
     iceland: [
-      // 1) Thingvellir National Park
+      //  Thingvellir National Park
       {
         coords: [-21.0000, 64.2550],
         popupHTML: `
@@ -235,15 +310,20 @@
             Wildling camp and a sword fight between Brienne and the Hound.
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
-            <img src="thingvellir_national_park1.jpg" alt="Thingvellir View 1" style="width:100%; border-radius:4px;" />
             <img src="thingvellir_national_park2.jpg" alt="Thingvellir View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Camille Beuvard / HBO    
             <img src="thingvellir_national_park3.jpg" alt="Thingvellir View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Kayleigh Roberts / HBO    
             <img src="thingvellir_national_park4.jpg" alt="Thingvellir View 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: 365 Focus Photography    
           </div>
         </div>`
       },
 
-      // 2) Svínafellsjökull
+      //  Svínafellsjökull
       {
         coords: [-16.7884, 64.0061],
         popupHTML: `
@@ -260,16 +340,19 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="svinafellsjökull1.jpg" alt="Svínafellsjökull View 1" style="width:100%; border-radius:4px;" />
-            <img src="svinafellsjökull2.jpg" alt="Svínafellsjökull View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Iceland in Pictures     
             <img src="svinafellsjökull3.jpg" alt="Svínafellsjökull View 3" style="width:100%; border-radius:4px;" />
-            <img src="svinafellsjökull4.jpg" alt="Svínafellsjökull View 4" style="width:100%; border-radius:4px;" />
-            <img src="svinafellsjökull5.jpg" alt="Svínafellsjökull View 5" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Camille Beuvard    
             <img src="svinafellsjökull6.jpg" alt="Svínafellsjökull View 6" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Home Box Office, Inc.    
           </div>
         </div>`
       },
 
-      // 3) Kirkjufell
+      //  Kirkjufell
       {
         coords: [-23.3064, 64.9270],
         popupHTML: `
@@ -286,8 +369,11 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="kirkjufell1.jpg" alt="Kirkjufell View 1" style="width:100%; border-radius:4px;" />
-            <img src="kirkjufell2.jpg" alt="Kirkjufell View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Kayleigh Roberts / HBO     
             <img src="kirkjufell3.jpg" alt="Kirkjufell View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Nick Davidson     
           </div>
         </div>`
       }
@@ -295,7 +381,7 @@
 
     // ───────────── Croatia ─────────────
     croatia: [
-      // 1) Dubrovnik
+      //  Dubrovnik
       {
         coords: [18.0944, 42.6400],
         popupHTML: `
@@ -311,17 +397,20 @@
             King’s Landing, including the City Walls and Gradac Park.
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
-            <img src="dubrovnik1.jpg" alt="Dubrovnik View 1" style="width:100%; border-radius:4px;" />
-            <img src="dubrovnik2.jpg" alt="Dubrovnik View 2" style="width:100%; border-radius:4px;" />
             <img src="dubrovnik3.jpg" alt="Dubrovnik View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Hello Jetlag / HBO    
             <img src="dubrovnik4.jpg" alt="Dubrovnik View 4" style="width:100%; border-radius:4px;" />
-            <img src="dubrovnik5.jpg" alt="Dubrovnik View 5" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Hello Jetlag / HBO    
             <img src="dubrovnik6.jpg" alt="Dubrovnik View 6" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Hello Jetlag / HBO    
           </div>
         </div>`
       },
 
-      // 2) Split
+      //  Split
       {
         coords: [16.4402, 43.5081],
         popupHTML: `
@@ -338,14 +427,19 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="split1.jpg" alt="Split View 1" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: The Wandering Blonde / HBO    
             <img src="split2.jpg" alt="Split View 2" style="width:100%; border-radius:4px;" />
-            <img src="split3.jpg" alt="Split View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Klis Fortress / HBO   
             <img src="split4.jpg" alt="Split View 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Expedia 
           </div>
         </div>`
       },
 
-      // 3) Šibenik
+      //  Šibenik
       {
         coords: [15.8950, 43.7350],
         popupHTML: `
@@ -361,10 +455,12 @@
             Braavos.
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
-            <img src="sibenik1.jpg" alt="Šibenik View 1" style="width:100%; border-radius:4px;" />
             <img src="sibenik2.jpg" alt="Šibenik View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: GoTlikeLocation / HBO    
             <img src="sibenik3.jpg" alt="Šibenik View 3" style="width:100%; border-radius:4px;" />
-            <img src="sibenik4.jpg" alt="Šibenik View 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: GoTlikeLocation / HBO    
           </div>
         </div>`
       }
@@ -372,7 +468,7 @@
 
     // ───────────── Spain ─────────────
     spain: [
-      // 1) Bardenas Reales
+      //  Bardenas Reales
       {
         coords: [-1.5353, 42.2051],
         popupHTML: `
@@ -389,13 +485,16 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="bardenas_reales1.jpg" alt="Bardenas Reales View 1" style="width:100%; border-radius:4px;" />
-            <img src="bardenas_reales2.jpg" alt="Bardenas Reales View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: got.motionpicture.fr / HBO     
             <img src="bardenas_reales3.jpg" alt="Bardenas Reales View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Nachteule
           </div>
         </div>`
       },
 
-      // 2) Castillo de Zafra, Guadalajara
+      //  Castillo de Zafra, Guadalajara
       {
         coords: [-2.2031, 40.8590],
         popupHTML: `
@@ -412,13 +511,16 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="castillo_de_zafra1.jpg" alt="Castillo de Zafra View 1" style="width:100%; border-radius:4px;" />
-            <img src="castillo_de_zafra2.jpg" alt="Castillo de Zafra View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Elcharlot / HBO     
             <img src="castillo_de_zafra3.jpg" alt="Castillo de Zafra View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Zunaira Ghazal     
           </div>
         </div>`
       },
 
-      // 3) The Ruins of Italica, Seville
+      //  The Ruins of Italica, Seville
       {
         coords: [-6.0442, 37.4360],
         popupHTML: `
@@ -435,15 +537,19 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="the_ruins_of_italica1.jpg" alt="Ruins of Italica View 1" style="width:100%; border-radius:4px;" />
-            <img src="the_ruins_of_italica2.jpg" alt="Ruins of Italica View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: ItalicaSevilla / HBO     
             <img src="the_ruins_of_italica3.jpg" alt="Ruins of Italica View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Diego Delso    
             <img src="the_ruins_of_italica4.jpg" alt="Ruins of Italica View 4" style="width:100%; border-radius:4px;" />
-            <img src="the_ruins_of_italica5.jpg" alt="Ruins of Italica View 5" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: ItalicaSevilla / HBO    
           </div>
         </div>`
       },
 
-      // 4) Alcázar of Seville
+      //  Alcázar of Seville
       {
         coords: [-5.9903, 37.3857],
         popupHTML: `
@@ -460,13 +566,16 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="alcázar_of_seville1.jpg" alt="Alcázar View 1" style="width:100%; border-radius:4px;" />
-            <img src="alcázar_of_seville2.jpg" alt="Alcázar View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: AlcazarSevilla / HBO     
             <img src="alcázar_of_seville3.jpg" alt="Alcázar View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: alliecatcowboyy  
           </div>
         </div>`
       },
 
-      // 5) Córdoba
+      //  Córdoba
       {
         coords: [-4.7794, 37.8882],
         popupHTML: `
@@ -483,8 +592,11 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="córdoba1.jpg" alt="Córdoba View 1" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: twopeasinaplane / HBO   
             <img src="córdoba2.jpg" alt="Córdoba View 2" style="width:100%; border-radius:4px;" />
-            <img src="córdoba3.jpg" alt="Córdoba View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Dusty Baxter-Wright / HBO    
           </div>
         </div>`
       }
@@ -492,7 +604,7 @@
 
     // ───────────── Morocco ─────────────
     morocco: [
-      // 1) Essaouira
+      //  Essaouira
       {
         coords: [-9.7620, 31.5085],
         popupHTML: `
@@ -508,15 +620,17 @@
             Astapor and some King’s Landing scenes.
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
-            <img src="essaouira1.jpg" alt="Essaouira View 1" style="width:100%; border-radius:4px;" />
             <img src="essaouira2.jpg" alt="Essaouira View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Jenny Lynn Ltd / HBO    
             <img src="essaouira3.jpg" alt="Essaouira View 3" style="width:100%; border-radius:4px;" />
-            <img src="essaouira4.jpg" alt="Essaouira View 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Jenny Lynn Ltd / HBO    
           </div>
         </div>`
       },
 
-      // 2) Ouarzazate
+      //  Ouarzazate
       {
         coords: [-6.9094, 30.9220],
         popupHTML: `
@@ -533,12 +647,16 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="ouarzazate1.jpg" alt="Ouarzazate View 1" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Hannah Kacary    
             <img src="ouarzazate2.jpg" alt="Ouarzazate View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: SarahRoller8 
           </div>
         </div>`
       },
 
-      // 3) Aït Benhaddou
+      //  Aït Benhaddou
       {
         coords: [-7.1304, 31.0471],
         popupHTML: `
@@ -555,9 +673,14 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="ait_benhaddou1.jpg" alt="Aït Benhaddou View 1" style="width:100%; border-radius:4px;" />
-            <img src="ait_benhaddou2.jpg" alt="Aït Benhaddou View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Roshina Jowaheer / HBO   
             <img src="ait_benhaddou3.jpg" alt="Aït Benhaddou View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Desertbrise Travel 
             <img src="ait_benhaddou4.jpg" alt="Aït Benhaddou View 4" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: earthsmagicalplaces / HBO    
           </div>
         </div>`
       }
@@ -565,7 +688,7 @@
 
     // ───────────── Malta ─────────────
     malta: [
-      // 1) Azure Window
+      //  Azure Window
       {
         coords: [14.1902, 36.0556],
         popupHTML: `
@@ -582,8 +705,14 @@
           </p>
           <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px;">
             <img src="azure_window1.jpg" alt="Azure Window View 1" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Reuters / HBO    
             <img src="azure_window2.jpg" alt="Azure Window View 2" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: adventurous-travels   
             <img src="azure_window3.jpg" alt="Azure Window View 3" style="width:100%; border-radius:4px;" />
+<p style="margin:0 0 5px; font-size:10px; color:#aaa;">
+          Image credit: Guy Bishopp / HBO   
           </div>
         </div>`
       }
@@ -591,62 +720,77 @@
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // Keep track of currently‐shown markers so we can remove them when switching countries
-  let activeMarkers = [];
+  // To keep track of currently‐shown markers
+    let activeMarkers = [];
 
-  function flyToCountry(code) {
-    const locations = {
-      uk:      { center: [-3.435973, 55.378051], zoom: 5 },
-      iceland: { center: [-19.0208, 64.9631], zoom: 5 },
-      croatia: { center: [15.2, 45.1], zoom: 6 },
-      spain:   { center: [-3.7038, 40.4168], zoom: 5.5 },
-      morocco: { center: [-6.8498, 33.9716], zoom: 5.5 },
-      malta:   { center: [14.5146, 35.8997], zoom: 7 }
-    };
+    function flyToCountry(code) {
+      const target = {
+        uk:      { center: [-3.435973, 55.378051], zoom: 5 },
+        iceland: { center: [-19.0208, 64.9631], zoom: 5 },
+        croatia: { center: [15.2, 45.1], zoom: 6 },
+        spain:   { center: [-3.7038, 40.4168], zoom: 5.5 },
+        morocco: { center: [-6.8498, 33.9716], zoom: 5.5 },
+        malta:   { center: [14.5146, 35.8997], zoom: 7 }
+      }[code];
 
-    const target = locations[code];
-    if (!target) return;
+      if (!target) return;
 
-    // 1) Remove any existing markers from the map
-    activeMarkers.forEach(marker => marker.remove());
-    activeMarkers = [];
+      // Lock panning to this country’s bounds
+      map.setMaxBounds(countryBounds[code]);
 
-    // 2) Fly the map to the new center/zoom
-    map.flyTo({
-      center:   target.center,
-      zoom:     target.zoom,
-      speed:    1.2,
-      curve:    1,
-      essential: true
-    });
+      // Remove old markers
+      activeMarkers.forEach(m => m.remove());
+      activeMarkers = [];
 
-    // 3) Once the globe finishes flying, add this country’s markers
-    map.once('moveend', () => {
-      (markerData[code] || []).forEach(entry => {
-        if (!entry.popupHTML) {
-          console.error('Missing popupHTML for marker:', entry);
-          return;
-        }
-
-        // 1) Create an <img> DOM node for your PNG icon
-const el = document.createElement('img');
-el.src = 'pin1.png';      // path to your PNG
-el.style.width = '50px';                // adjust size as needed
-el.style.height = '50px';
-el.style.cursor = 'pointer';            // if you want a pointer cursor on hover
-// (You can also add border-radius, box-shadow, etc. by inline CSS or a CSS class)
-
-// 2) Instantiate the marker using that element
-const marker = new mapboxgl.Marker({ element: el })
-  .setLngLat(entry.coords)
-  .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(entry.popupHTML))
-  .addTo(map);
-
-activeMarkers.push(marker);
+      // Fly there
+      map.flyTo({
+        center:   target.center,
+        zoom:     target.zoom,
+        speed:    1.2,
+        curve:    1,
+        essential: true
       });
-    });
-  }
-</script>
 
+      // To add markers once movement ends
+      map.once('moveend', () => {
+        (markerData[code] || []).forEach(entry => {
+          if (!entry.popupHTML) return;
+
+          // Custom marker
+          const el = document.createElement('img');
+          el.src = 'pin1.png';
+          el.style.width  = '50px';
+          el.style.height = '50px';
+          el.style.cursor = 'pointer';
+
+          const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+            .setLngLat(entry.coords)
+            .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(entry.popupHTML))
+            .addTo(map);
+
+          activeMarkers.push(marker);
+        });
+      });
+    }
+
+    // To reset view back to global
+    function resetView() {
+      // remove markers
+      activeMarkers.forEach(m => m.remove());
+      activeMarkers = [];
+
+      // clear bounds
+      map.setMaxBounds(null);
+
+      // fly to full globe
+      map.flyTo({
+        center: [0, 20],
+        zoom:   1.5,
+        speed:  1.2,
+        curve:  1,
+        essential: true
+      });
+    }
+  </script>
 </body>
 </html>
